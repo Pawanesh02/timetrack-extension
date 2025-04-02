@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimeTrack Settings</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #34d399;
+      --secondary-dark: #10b981;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --background: #f9fafb;
+      --card: #ffffff;
+      --destructive: #ef4444;
+      --warning: #f59e0b;
+      --border: #e5e7eb;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .header {
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .header h1 {
+      font-size: 1.875rem;
+      color: var(--text);
+    }
+    
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .card {
+      background-color: var(--card);
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .card-content {
+      padding: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-group input[type="number"],
+    .form-group select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      font-size: 1rem;
+    }
+    
+    .form-group input[type="number"]:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    
+    .form-check {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .form-check:last-child {
+      margin-bottom: 0;
+    }
+    
+    .form-check input[type="checkbox"] {
+      margin-right: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+    }
+    
+    .form-description {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-top: 0.25rem;
+    }
+    
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .button.secondary {
+      background-color: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .button.secondary:hover {
+      background-color: var(--background);
+    }
+    
+    .button.warning {
+      background-color: var(--warning);
+    }
+    
+    .button.warning:hover {
+      background-color: #d97706;
+    }
+    
+    .button.destructive {
+      background-color: var(--destructive);
+    }
+    
+    .button.destructive:hover {
+      background-color: #dc2626;
+    }
+    
+    .blocked-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+    
+    .blocked-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .blocked-item:last-child {
+      border-bottom: none;
+    }
+    
+    .domain-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .domain-input input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+    
+    .domain-input input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    
+    .alert.success {
+      background-color: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #d1fae5;
+    }
+    
+    .alert.error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fee2e2;
+    }
+    
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.875rem;
+      color: var(--text-light);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>TimeTrack Settings</h1>
+    <p>Configure your tracking and focus mode preferences</p>
+  </div>
+  
+  <div id="alert" class="alert success"></div>
+  
+  <div class="main-content">
+    <!-- Focus Mode Settings -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Focus Mode Settings</h2>
+      </div>
+      <div class="card-content">
+        <div class="form-group">
+          <label for="focus-duration">Default focus duration (minutes)</label>
+          <input type="number" id="focus-duration" min="5" max="180" value="25">
+          <p class="form-description">How long each focus session should last by default</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="break-duration">Default break duration (minutes)</label>
+          <input type="number" id="break-duration" min="1" max="30" value="5">
+          <p class="form-description">How long break periods should last by default</p>
+        </div>
+        
+        <div class="form-check">
+          <input type="checkbox" id="auto-start-breaks">
+          <label for="auto-start-breaks">Auto-start breaks after focus sessions</label>
+        </div>
+        
+        <div class="form-check">
+          <input type="checkbox" id="auto-start-sessions">
+          <label for="auto-start-sessions">Auto-start focus sessions after breaks</label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Blocked Websites -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Blocked Websites</h2>
+      </div>
+      <div class="card-content">
+        <p>These websites will be blocked during focus mode sessions.</p>
+        
+        <div class="domain-input">
+          <input type="text" id="new-domain" placeholder="e.g., facebook.com">
+          <button id="add-domain" class="button">Add</button>
+        </div>
+        
+        <ul class="blocked-list" id="blocked-list">
+          <!-- Blocked sites will be inserted here -->
+          <li class="blocked-item empty-state">No websites blocked yet</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Data Management -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Data Management</h2>
+      </div>
+      <div class="card-content">
+        <div class="form-group">
+          <label for="data-export-format">Export format</label>
+          <select id="data-export-format">
+            <option value="json">JSON</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+        
+        <div class="button-group">
+          <button id="export-data" class="button">Export Data</button>
+          <button id="clear-data" class="button destructive">Clear All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div>TimeTrack Extension v1.0.0</div>
+    <div>
+      <button id="save-settings" class="button">Save Settings</button>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

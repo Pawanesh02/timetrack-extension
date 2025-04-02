@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Mode - Site Blocked</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #34d399;
+      --text-light: #f9fafb;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .container {
+      max-width: 600px;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--text-light), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    p {
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .timer {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 2rem 0;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    button {
+      background-color: white;
+      color: var(--primary);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    button.secondary {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+    }
+    
+    .motivational {
+      font-style: italic;
+      margin-top: 2rem;
+      opacity: 0.8;
+    }
+    
+    .footer {
+      margin-top: 3rem;
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Site Blocked</h1>
+    <p>This website is currently blocked because you're in Focus Mode. Stay focused on your work!</p>
+    
+    <div class="timer" id="focus-timer">25:00</div>
+    
+    <p>Remaining time in your focus session</p>
+    
+    <div class="motivational">"Focus on being productive instead of busy." — Tim Ferriss</div>
+    
+    <div class="controls">
+      <button id="end-focus-mode">End Focus Mode</button>
+      <button class="secondary" id="go-back">Go Back</button>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>TimeTrack Browser Extension</p>
+  </div>
+  
+  <script>
+    // Get DOM elements
+    const focusTimerElement = document.getElementById('focus-timer');
+    const endFocusModeButton = document.getElementById('end-focus-mode');
+    const goBackButton = document.getElementById('go-back');
+    
+    let focusTimer;
+    let remainingTime = 0;
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get the remaining time from storage
+      chrome.storage.local.get(['focusEndTime'], (result) => {
+        if (result.focusEndTime) {
+          const now = new Date().getTime();
+          const endTime = new Date(result.focusEndTime).getTime();
+          
+          if (endTime > now) {
+            remainingTime = Math.floor((endTime - now) / 1000);
+            startTimer();
+          } else {
+            // Focus session should have ended
+            chrome.runtime.sendMessage({ action: 'endFocusMode' });
+            window.close();
+          }
+        } else {
+          // No active focus session
+          chrome.runtime.sendMessage({ action: 'endFocusMode' });
+          window.close();
+        }
+      });
+      
+      // Set up event listeners
+      endFocusModeButton.addEventListener('click', () => {
+        chrome.runtime.sendMessage({ action: 'endFocusMode' }, () => {
+          // Redirect to the dashboard
+          window.location.href = chrome.runtime.getURL('dashboard.html');
+        });
+      });
+      
+      goBackButton.addEventListener('click', () => {
+        // Go back to the previous page
+        window.history.back();
+      });
+    });
+    
+    // Start the timer
+    function startTimer() {
+      // Update the display
+      updateTimerDisplay();
+      
+      // Start the interval
+      focusTimer = setInterval(() => {
+        remainingTime--;
+        
+        // Update the display
+        updateTimerDisplay();
+        
+        // Check if the timer has ended
+        if (remainingTime <= 0) {
+          clearInterval(focusTimer);
+          
+          // End focus mode
+          chrome.runtime.sendMessage({ action: 'endFocusMode' });
+          
+          // Reload the page
+          window.location.reload();
+        }
+      }, 1000);
+    }
+    
+    // Update the timer display
+    function updateTimerDisplay() {
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+      
+      focusTimerElement.textContent = `${padZero(minutes)}:${padZero(seconds)}`;
+    }
+    
+    // Pad a number with leading zero if needed
+    function padZero(num) {
+      return num.toString().padStart(2, '0');
+    }
+  </script>
+</body>
+</html>
